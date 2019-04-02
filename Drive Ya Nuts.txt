@@ -1,0 +1,67 @@
+﻿Benjamin Siege
+3/2/19
+Drive Ya nuts
+
+
+Generation
+        To generate a possible puzzle of n sides i generate list of numbers from 1 to n and then for each piece take a random number and then check if the piece is not already present in the puzzle:
+>>> genPuzzle(5)
+[[1, 5, 3, 4, 2], [1, 5, 2, 3, 4], [1, 3, 2, 4, 5], [1, 5, 3, 2, 4], [1, 3, 2, 5, 4], [1, 4, 2, 3, 5]]
+The way i represent the puzzle is as a list of lists. The first list is the center piece and the first element of each other piece matches the corresponding index of the center. (they all start with 1 because i rotate them to start with 1 to check uniqueness under rotation).
+
+
+Brute Force
+        For brute force i first use my permute function to generate all possible placements of pieces for the given puzzle:
+>>> a = genPuzzle(4)
+>>> permutation(a)
+[[[1, 3, 2, 4], [1, 4, 3, 2], [1, 2, 4, 3], [1, 4, 2, 3], [1, 2, 3, 4]], 
+[[1, 3, 2, 4], [1, 4, 3, 2], [1, 2, 4, 3], [1, 2, 3, 4], [1, 4, 2, 3]], 
+[[1, 3, 2, 4], [1, 4, 3, 2], [1, 4, 2, 3], [1, 2, 4, 3], [1, 2, 3, 4]] …
+I only include a small selection of the states generated as there are quite a few of them even for just a 4 sided puzzle. After getting all states i traverse the list and for each puzzle rotate the external pieces to match the center and then check if it is a solution. The function bruteForceSingle takes in a size for a puzzle and does all three steps and returns the first solution found:
+[[4, 1, 2, 3], [4, 2, 3, 1], [1, 3, 4, 2], [2, 4, 1, 3], [3, 1, 2, 4]]
+0.0007605552673339844 Seconds
+To calculate the time it takes for a function i use the python time library.
+
+
+Prune
+        To prune i modified the function that generates all possible states to be more selective. The permutation method recursively does a breadth first search of states and for brute force just returns a list of all of them. To change it to pruning i check each time i add a piece to a puzzle to see if the piece matches the pieces already in the puzzle, if the puzzle would remain in a valid state then it adds the piece and continues to the next branch. This method of pruning results in the algorithm running about 5 times faster:
+[]
+PRUNE: 0.7094 Seconds 
+[]
+BRUTE: 4.5582 Seconds
+In this example i had the pruning algorithm and the brute force algorithm each run for a 8 sided puzzle (no solutions were found probably because solutions for 8 sided puzzles are rare). In this case the pruning algorithm is about 6 times faster.
+
+
+Count 
+        To count the number of possible solutions i simply count the length of the list of all possible solutions returned by the pruning algorithm:
+>>> sols = prune(4)
+>>> sols
+[[1, 2, 4, 3], [1, 3, 2, 4], [2, 1, 4, 3], [4, 2, 3, 1], [3, 4, 1, 2], [1, 2, 4, 3], [1, 4, 3, 2], [2, 3, 1, 4], [4, 1, 2, 3], [3, 2, 4, 1]]
+>>> len(sols)
+2
+In this case there were 2 solutions found for a 4 sided puzzle. (for many examples i am showing the algorithms working on 4 sided puzzles because the always have solutions).
+
+
+Graph
+        Before i started the process of running prune for 100’s or 1000’s of puzzles i first graphed the time it takes to run puzzles of different sides:
+  
+
+As you can see it takes almost a minute to run a 10 sided puzzle so for the sake of not wasting my time i will be running 200 puzzles for puzzles of 5 - 9 sides and then taking the average number of solutions per puzzle. Something i see very quickly as i am running the tests is that as the number of sides increase the average number of solutions (sum of number of solutions for each puzzle divided by the number of puzzles ran) decreases while the run time increases both at what seem to be exponential rates. From this i can conclude 2 things, that it is harder to determine an accurate number for the average at higher side counts and that the relationship between runtime and average number of solutions is probably related.
+  
+ 
+As the sample size for this is small there could be discrepancies and unseen outliers that could radically change the data but just looking at the tests already run my earlier hypothesis is given weight as the graphs of runtime and of solutions seem to mirror each other. 
+
+
+MAIN
+        To run the provided puzzle just run the function called MAIN(): 
+>>> MAIN()
+[[[1, 6, 2, 4, 5, 3], [1, 4, 6, 2, 3, 5], [6, 5, 3, 2, 4, 1], [2, 1, 4, 3, 6, 5], [4, 5, 6, 1, 2, 3], [5, 3,1, 6, 4, 2], [3, 2, 1, 6, 5, 4]]]
+
+
+In this case there is only one solution found.
+
+
+CONCLUSION
+        This was an interesting assignment. My biggest struggles with it were mostly of my own making. The biggest struggle was with running the given puzzle, as when i ran it i was unable to come up with any solutions. I discovered that the problem was i had been checking the centerpiece and edges in different directions which hadn’t been a problem before as my code was consistent with itself. In order to load my functions into the python console simply enter python3 and run :
+        exec(open('dNuts.py').read())
+This will allow you to run any of my functions from the python command line interface.
